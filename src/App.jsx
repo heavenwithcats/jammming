@@ -1,121 +1,171 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+const clientID = '2ae6327813dd4c5fbcee78403962e87d';
+const redirectUri = 'https://heavenwithcats.github.io/Jammming/';
+let accessToken;
+const Spotify = {
+  getAccessToken() {
+    if (accessToken) { return accessToken; }
+    const accessTokenMatch = window.location.href.match(/access_token=([^&]*)/);
+    const expiresInMatch = window.location.href.match(/expires_in=([^&]*)/);
+    if (accessTokenMatch && expiresInMatch) {
+      accessToken = accessTokenMatch[1];
+      const expiresIn = Number(expiresInMatch[1]);
+      window.setTimeout(() => accessToken = '', expiresIn * 1000);
+      window.history.pushState('Access Token', null, '/');
+      return accessToken;
+    } else {
+    window.location = `https://accounts.spotify.com/authorize?client_id=$?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
+    }
+  },
 
+  search(searchTerms) {
+const token = Spotify.getAccessToken();
+if(!token) { return Promise.resolve([]); }
+return fetch(`https://www.google.com/search?q=https://api.spotify.com/v1/playlists/${searchTerms}&type=track`, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+}).then(response => {
+  return response.json();
+}).then(jsonResponse => {
+  if (!jsonResponse.tracks) {
+    return [];
+  }
+  return jsonResponse.tracks.items.map(track => ({
+    id: track.id,
+    name: track.name,
+    artist: track.artists[0].name,
+    album: track.album.name,
+    uri: track.uri
+  }))
+})},
+
+  savePlaylist(playlistName, uris) {
+    if (!playlistName || !uris.length) {
+      return;
+    }
+  const saveToken = Spotify.getAccessToken();
+  const headers = { Authorization: `Bearer ${saveToken}`};
+  let userId;
+
+  return fetch('https://api.spotify.com/v1/me', { headers: headers })
+  .then(response => response.json())
+  .then(jsonResponse => {
+    userId = jsonResponse.id;
+ return fetch(`https://api.spotify.com/v1/users/$${userId}/playlists`, {
+  headers: headers,
+  method: 'POST',
+  body: JSON.stringify({ name: playlistName })
+ })
+  .then(response => response.json())
+  .then(jsonResponse => {
+const playlistId = jsonResponse.id;
+return fetch(`https://api.spotify.com/v1/playlists/$${playlistId}/tracks`, {
+  headers: headers,
+  method: 'POST',
+  body: JSON.stringify({ uris: uris })
+ })
+  });
+  });
+  } 
+};
+const SearchBar = (props) => {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div>
+      <input placeholder='search songs' onChange={(e) => props.onSearch(e.target.value)} />
+    </div>
+  );
+};
+const Search = (props) => {
+  return (
+    <div>
+      <button onClick={props.onSearch} > search </button>
+    </div>
+  );
+};
+const SearchResults = (props) => {
+  let isRemoval = false;
+  return (
+    <div>
+      <h2>Results ☆
 
-      <div className="ticks"></div>
+      </h2>
+      <Tracklist tracks={props.results} onAdd={props.onAdd} isRemoval={isRemoval} />
+    </div>
+  );
+};
+const Playlist = (props) => {
+  let isRemoval = true;
+  return (
+    <div>
+      <h2>Playlist ♡</h2>
+      <input defaultValue={"New Playlist"} onChange={(e) => props.onNameChange(e.target.value)}/>
+      <Tracklist tracks={props.tracks} onDelete={props.onDelete} isRemoval={isRemoval} />
+    </div>
+  );
+};
+const Tracklist = (props) => {
+  return (
+    <div>
+      {props.tracks.map((song) => {
+        return <Track oneTrack={song} key={song.id} onAdd={props.onAdd} onDelete={props.onDelete} isRemoval={props.isRemoval} />;
+      })}
+    </div>
+  );
+};
+const Track = (props) => {
+  return (
+    <div>
+      <h3>{props.oneTrack.name}</h3>
+      <h4>{props.oneTrack.artist}</h4>
+      <h4>{props.oneTrack.album}</h4>
+      {props.isRemoval ? (<button onClick={() => props.onDelete(props.oneTrack.id)}>-</button>) :
+        (<button onClick={() => props.onAdd(props.oneTrack)}>+</button>)}
+    </div>
+  );
+};
+const SaveToSpotify = (props) => {
+  return (
+    <div><button onClick={props.savePlaylist}>Save to Spotify</button></div>
+  );
+};
+const App = () => {
+  const [searchTerms, setSearchTerms] = useState('');
+  const [playlistName, setPlaylistName] = useState('');
+  const [tracks, setTracks] = useState([]);
+  const [searchResults, setSearchResults] = useState([ ]);
+  function savePlaylist(e) {
+    const uris = tracks.map(track => track.uri);
+    e.preventDefault();
+    Spotify.savePlaylist(playlistName, uris);
+   setPlaylistName('New playlist');
+   setTracks([]);
+  }
+  function handleSearch(e) {
+    e.preventDefault();
+    Spotify.search(searchTerms).then(results => setSearchResults(results));
+  }
+  let addTrack = (track) => {
+    setTracks(prev => [track, ...prev]);
+  };
+  let removeTrack = (trackIdToRemove) => {
+    setTracks((tracks) => tracks.filter((track) => track.id !== trackIdToRemove));
+  };
+  return (
+    <div>
+      <div>
+        <SearchBar onSearch={setSearchTerms} />    
+        <Search onSearch={handleSearch}/>
+        <SearchResults results={searchResults} onAdd={addTrack} />
+      </div>
+      <div>
+        <Playlist tracks={tracks} onDelete={removeTrack} onNameChange={setPlaylistName} />
+        <SaveToSpotify savePlaylist={savePlaylist} />
+      </div>
+    </div>
+  );
+};
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
-
-export default App
+export default App;
