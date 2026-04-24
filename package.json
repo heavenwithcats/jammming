@@ -1,4 +1,5 @@
 {
+  "homepage": "https://heavenwithcats.github.io/Jammming/"
   "name": "jammming",
   "private": true,
   "version": "0.0.0",
@@ -7,6 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -25,3 +28,8 @@
     "vite": "^8.0.4"
   }
 }
+
+
+
+
+  
