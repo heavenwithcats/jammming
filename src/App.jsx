@@ -15,14 +15,14 @@ const Spotify = {
       window.history.pushState('Access Token', null, '/');
       return accessToken;
     } else {
-   window.location = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri};`
+   window.location = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
     }
   },
 
   search(searchTerms) {
 const token = Spotify.getAccessToken();
 if(!token) { return Promise.resolve([]); }
-return fetch(`https://www.google.com/search?q=https://api.spotify.com/v1/playlists/${searchTerms}&type=track`, {
+return fetch(`https://api.spotify.com/v1/search?type=track&q=${searchTerms}`, {
   headers: {
     Authorization: `Bearer ${token}`
   }
@@ -53,7 +53,7 @@ return fetch(`https://www.google.com/search?q=https://api.spotify.com/v1/playlis
   .then(response => response.json())
   .then(jsonResponse => {
     userId = jsonResponse.id;
- return fetch(`https://api.spotify.com/v1/users/$${userId}/playlists`, {
+ return fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
   headers: headers,
   method: 'POST',
   body: JSON.stringify({ name: playlistName })
@@ -61,7 +61,7 @@ return fetch(`https://www.google.com/search?q=https://api.spotify.com/v1/playlis
   .then(response => response.json())
   .then(jsonResponse => {
 const playlistId = jsonResponse.id;
-return fetch(`https://api.spotify.com/v1/playlists/$${playlistId}/tracks`, {
+return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
   headers: headers,
   method: 'POST',
   body: JSON.stringify({ uris: uris })
@@ -100,7 +100,7 @@ const Playlist = (props) => {
   return (
     <div>
       <h2>Playlist ♡</h2>
-      <input defaultValue={"New Playlist"} onChange={(e) => props.onNameChange(e.target.value)}/>
+      <input defaultValue={"New playlist"} onChange={(e) => props.onNameChange(e.target.value)}/>
       <Tracklist tracks={props.tracks} onDelete={props.onDelete} isRemoval={isRemoval} />
     </div>
   );
