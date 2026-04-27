@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const clientID = '2ae6327813dd4c5fbcee78403962e87d';
-const redirectUri = 'https://heavenwithcats.github.io/Jammming/';
+const redirectUri = 'https://the-jammming-1.netlify.app/';
 let accessToken;
 const Spotify = {
   getAccessToken() {
@@ -15,7 +15,7 @@ const Spotify = {
       window.history.pushState('Access Token', null, '/');
       return accessToken;
     } else {
-    window.location = `https://accounts.spotify.com/authorize?client_id=$?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
+    window.location = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
     }
   },
 
