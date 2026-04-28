@@ -165,7 +165,7 @@ const App = () => {
     setTracks((tracks) => tracks.filter((track) => track.id !== trackIdToRemove));
   };
   return (
-    <div>
+    <div className="App">
       <div>
         <SearchBar onSearch={setSearchTerms} />    
         <Search onSearch={handleSearch}/>

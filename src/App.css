@@ -1,3 +1,14 @@
+:root {
+  --wolf-bg: none;
+}
+.App {
+  color: #e7fff9;
+background-image: var(--wolf-bg);
+background-size: cover;
+background-position: center;
+transition: background 0.8s ease-in-out;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+}
 .counter {
   font-size: 16px;
   padding: 5px 10px;
