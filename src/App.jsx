@@ -142,9 +142,12 @@ const App = () => {
     appElement.style.backgroundColor = '#0a1b51';
     appElement.style.backgroundImage = `url(${wolfImage})`
     appElement.style.minHeight = '100vh'
-    }else{
+  appElement.style.color = '#748CAB'  
+  }else{
      appElement.style.backgroundColor = '#fff'
      appElement.style.backgroundImage = 'none'
+    appElement.style.color = '#000'  
+  
     }
   }
   }, [wolfToggle]);
