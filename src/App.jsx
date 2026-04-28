@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import wolfImage from '/Gemini_Generated_Image_j9ys38j9ys38j9ys.png'
+import wolfImage from './Gemini_Generated_Image_j9ys38j9ys38j9ys.jpg';
 
 const clientID = '2ae6327813dd4c5fbcee78403962e87d';
 const redirectUri = 'https://the-jammming-1.netlify.app/';
