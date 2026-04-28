@@ -141,6 +141,7 @@ const App = () => {
     if(wolfToggle) {
     appElement.style.backgroundColor = '#0a1b51';
     appElement.style.backgroundImage = `url(${wolfImage})`
+    appElement.style.minHeight = '100vh'
     }else{
      appElement.style.backgroundColor = '#fff'
      appElement.style.backgroundImage = 'none'
