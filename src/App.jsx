@@ -142,7 +142,7 @@ const App = () => {
     }else{
        root.style.setProperty('--wolf-bg', 'none');
     }
-  } [wolfToggle]);
+  }, [wolfToggle]);
   const [searchTerms, setSearchTerms] = useState('');
   const [playlistName, setPlaylistName] = useState('');
   const [tracks, setTracks] = useState([]);
