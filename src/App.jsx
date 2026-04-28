@@ -138,7 +138,7 @@ const App = () => {
     const root = document.documentElement;
 
     if(wolfToggle) {
-      root.style.setProperty('--wolf-bg', `url(${wolfImage})`);
+      root.style.setProperty('--wolf-bg', `url(${wolfImage}), #0a1b51`);
     }else{
        root.style.setProperty('--wolf-bg', 'none');
     }
