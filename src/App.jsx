@@ -135,13 +135,17 @@ const App = () => {
   const [wolfToggle, setWolfToggle] = useState(false)
   
   useEffect(() => {
-    const root = document.documentElement;
+    const appElement = document.querySelector('.App');
 
+    if(appElement){
     if(wolfToggle) {
-      root.style.setProperty('--wolf-bg', `url(${wolfImage}), #0a1b51`);
+    appElement.style.backgroundColor = '#0a1b51';
+    appElement.style.backgroundImage = `url(${wolfImage})`
     }else{
-       root.style.setProperty('--wolf-bg', 'none');
+     appElement.style.backgroundColor = '#fff'
+     appElement.style.backgroundImage = 'none'
     }
+  }
   }, [wolfToggle]);
   const [searchTerms, setSearchTerms] = useState('');
   const [playlistName, setPlaylistName] = useState('');
