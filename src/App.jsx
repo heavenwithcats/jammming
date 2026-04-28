@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import wolfImage from '/Gemini_Generated_Image_j9ys38j9ys38j9ys.png'
 
 const clientID = '2ae6327813dd4c5fbcee78403962e87d';
 const redirectUri = 'https://the-jammming-1.netlify.app/';
@@ -131,6 +132,17 @@ const SaveToSpotify = (props) => {
   );
 };
 const App = () => {
+  const [wolfToggle, setWolfToggle] = useState(false)
+  
+  useEffect(() => {
+    const root = document.documentElement;
+
+    if(wolfToggle) {
+      root.style.setProperty('--wolf-bg', `url(${wolfImage})`);
+    }else{
+       root.style.setProperty('--wolf-bg', 'none');
+    }
+  } [wolfToggle]);
   const [searchTerms, setSearchTerms] = useState('');
   const [playlistName, setPlaylistName] = useState('');
   const [tracks, setTracks] = useState([]);
@@ -162,6 +174,7 @@ const App = () => {
       <div>
         <Playlist tracks={tracks} onDelete={removeTrack} onNameChange={setPlaylistName} />
         <SaveToSpotify savePlaylist={savePlaylist} />
+      <button onClick={() => setWolfToggle(!wolfToggle)}>Click me!</button>
       </div>
     </div>
   );
